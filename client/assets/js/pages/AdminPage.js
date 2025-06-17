@@ -1,259 +1,118 @@
-// ============== File: client/assets/js/pages/AdminPage.js ==============
-import state from '../state.js';
-import { formatRupiah } from '../utils/formatters.js';
-import { addProduct, fetchHistory, fetchProducts } from '../apiService.js';
-import { showToast } from '../utils/toast.js';
-import { render } from '../app.js';
-
-export const renderAdminPage = async () => {
-    const history = await fetchHistory();
-    const totalSales = history.soldProducts.reduce((sum, p) => sum + (p.sold * p.price), 0);
-    const topProduct = history.soldProducts[0] || { name: '-', sold: 0 };
-    const lowStockProducts = state.products.filter(p => p.stock < 10);
-    
-    document.title = 'Admin Dashboard - SembakoNOW';
-
-    const pageContent = `
-        <div class="container mx-auto p-4">
-            <h2 class="text-3xl font-extrabold mb-6">Admin Dashboard</h2>
-            <div class="grid md:grid-cols-3 gap-4 mb-8">
-                <div class="bg-white p-4 rounded-lg shadow-sm"><h4 class="font-semibold text-gray-500">Total Penjualan</h4><p class="text-2xl font-bold">${formatRupiah(totalSales)}</p></div>
-                <div class="bg-white p-4 rounded-lg shadow-sm"><h4 class="font-semibold text-gray-500">Barang Paling Laku</h4><p class="text-2xl font-bold">${topProduct.name}</p></div>
-                <div class="bg-white p-4 rounded-lg shadow-sm"><h4 class="font-semibold text-gray-500">Stok Menipis</h4><p class="text-2xl font-bold text-orange-500">${lowStockProducts.length} Produk</p></div>
-            </div>
-            <div class="grid lg:grid-cols-2 gap-8">
-                <div class="bg-white rounded-lg shadow-sm p-6">
-                    <h3 class="text-xl font-bold mb-4">Tambah Barang Baru</h3>
-                    <form id="add-product-form" class="space-y-4">
-                        <div><label class="font-semibold">Nama Barang</label><input type="text" name="name" required class="w-full p-2 border rounded-md mt-1"></div>
-                        <div><label class="font-semibold">Kategori</label><input type="text" name="category" required class="w-full p-2 border rounded-md mt-1"></div>
-                        <div class="grid grid-cols-2 gap-4">
-                            <div><label class="font-semibold">Harga</label><input type="number" name="price" required class="w-full p-2 border rounded-md mt-1"></div>
-                            <div><label class="font-semibold">Stok</label><input type="number" name="stock" required class="w-full p-2 border rounded-md mt-1"></div>
-                        </div>
-                        <button type="submit" class="primary-btn w-full">Tambah Produk</button>
-                    </form>
-                </div>
-                <div class="bg-white rounded-lg shadow-sm p-6">
-                    <h3 class="text-xl font-bold mb-4">Riwayat Barang</h3>
-                    <div class="space-y-4">
-                        <div>
-                            <h4 class="font-semibold mb-2">Baru Ditambahkan</h4>
-                            <ul class="h-48 overflow-y-auto border rounded-md p-2 space-y-1">${history.newProducts.map(p => `<li class="py-1 text-sm list-none"><strong>${p.name}</strong> (Stok: ${p.stock})</li>`).join('')}</ul>
-                        </div>
-                        <div>
-                            <h4 class="font-semibold mb-2">Terlaris</h4>
-                            <ul class="h-48 overflow-y-auto border rounded-md p-2 space-y-1">${history.soldProducts.map(p => `<li class="py-1 text-sm list-none"><strong>${p.name}</strong> (Terjual: ${p.sold})</li>`).join('')}</ul>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    `;
-
-    // Kita akan menambahkan event listener setelah konten dirender di app.js
-    return pageContent;
-};
-
-
-// ============== File: client/assets/js/pages/CartPage.js ==============
-import state from '../state.js';
-import { formatRupiah } from '../utils/formatters.js';
-import { submitOrder } from '../apiService.js';
+import { getProducts, addProduct, updateProduct, deleteProduct, getProductById } from '../apiService.js';
 import { showToast } from '../utils/toast.js';
 
-let isSubmitting = false;
-
-export const renderCartPage = () => {
-    const cartDetails = state.cart.map(item => {
-        const product = state.products.find(p => p.id === item.productId);
-        return { ...product, quantity: item.quantity };
-    }).filter(item => item.id);
-
-    const subtotal = cartDetails.reduce((sum, item) => sum + (item.price * item.quantity), 0);
-    document.title = 'Keranjang Belanja - SembakoNOW';
-
-    const pageContent = `
-        <div class="container mx-auto p-4">
-            <h2 class="text-3xl font-extrabold mb-6">Keranjang Saya</h2>
-            ${cartDetails.length === 0 ? `
-                <div class="text-center py-16">
-                    <i data-lucide="shopping-cart" class="mx-auto w-16 h-16 text-gray-300"></i>
-                    <p class="text-gray-500 mt-4">Keranjang Anda masih kosong.</p>
-                    <a href="#products" class="nav-link mt-4 inline-block primary-btn">Mulai Belanja</a>
-                </div>
-            ` : `
-                <div class="grid lg:grid-cols-3 gap-8">
-                    <div class="lg:col-span-2 space-y-4">
-                        ${cartDetails.map(item => `
-                            <div class="bg-white rounded-lg shadow-sm p-4 flex items-center gap-4">
-                                <img src="${item.image}" alt="[Gambar ${item.name}]" class="w-20 h-20 rounded-md object-cover">
-                                <div class="flex-grow">
-                                    <h3 class="font-semibold">${item.name}</h3>
-                                    <p class="text-emerald-600 font-bold">${formatRupiah(item.price)}</p>
-                                </div>
-                                <div class="flex items-center border rounded-md">
-                                    <button class="cart-quantity-btn p-2" data-id="${item.id}" data-action="decrease"><i data-lucide="minus" class="w-4 h-4"></i></button>
-                                    <span class="px-3">${item.quantity}</span>
-                                    <button class="cart-quantity-btn p-2" data-id="${item.id}" data-action="increase"><i data-lucide="plus" class="w-4 h-4"></i></button>
-                                </div>
-                                <p class="font-bold w-28 text-right">${formatRupiah(item.price * item.quantity)}</p>
-                                <button class="remove-from-cart-btn text-gray-400 hover:text-red-500" data-id="${item.id}"><i data-lucide="trash-2"></i></button>
-                            </div>
-                        `).join('')}
+export const AdminPage = {
+    render: async () => `
+        <main class="container mx-auto p-4">
+            <h1 class="text-3xl font-bold mb-6">Panel Admin</h1>
+            <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+                <h2 class="text-2xl font-semibold mb-4" id="form-title">Tambah Produk Baru</h2>
+                <form id="product-form" class="space-y-4">
+                    <input type="hidden" id="product-id">
+                    <div>
+                        <label for="name" class="block text-sm font-medium text-gray-700">Nama Produk</label>
+                        <input type="text" id="name" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required>
                     </div>
-                    <div class="bg-white rounded-lg shadow-sm p-6 h-fit sticky top-24">
-                        <h3 class="text-xl font-bold mb-4">Ringkasan & Checkout</h3>
-                        <form id="checkout-form">
-                            <div class="space-y-3 mb-4">
-                                 <input type="text" name="name" required placeholder="Nama Lengkap" class="w-full p-2 border rounded-md">
-                                 <input type="tel" name="phone" required placeholder="No. HP" class="w-full p-2 border rounded-md">
-                                 <textarea name="address" rows="3" required placeholder="Alamat Lengkap" class="w-full p-2 border rounded-md"></textarea>
-                            </div>
-                            <div class="flex justify-between mb-2"><span class="text-gray-600">Subtotal</span><span class="font-semibold">${formatRupiah(subtotal)}</span></div>
-                            <hr class="my-4">
-                            <div class="flex justify-between font-bold text-lg mb-6"><span>Total</span><span>${formatRupiah(subtotal)}</span></div>
-                            <button type="submit" class="primary-btn w-full" ${isSubmitting ? 'disabled' : ''}>
-                               ${isSubmitting ? '<i data-lucide="loader-2" class="animate-spin mx-auto"></i>' : 'Buat Pesanan'}
-                            </button>
-                        </form>
+                    <div>
+                        <label for="price" class="block text-sm font-medium text-gray-700">Harga</label>
+                        <input type="number" id="price" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2" required>
                     </div>
-                </div>
-            `}
-        </div>
-    `;
-    return pageContent;
-};
+                    <div>
+                        <label for="image" class="block text-sm font-medium text-gray-700">URL Gambar</label>
+                        <input type="text" id="image" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2">
+                    </div>
+                    <div>
+                        <label for="description" class="block text-sm font-medium text-gray-700">Deskripsi</label>
+                        <textarea id="description" rows="4" class="mt-1 block w-full border border-gray-300 rounded-md shadow-sm p-2"></textarea>
+                    </div>
+                    <div class="flex gap-4">
+                        <button type="submit" id="submit-btn" class="bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700">Simpan</button>
+                        <button type="button" id="cancel-edit-btn" class="bg-gray-300 py-2 px-4 rounded-md hover:bg-gray-400 hidden">Batal</button>
+                    </div>
+                </form>
+            </div>
+            <h2 class="text-2xl font-semibold mb-4">Daftar Produk</h2>
+            <div id="admin-product-list" class="space-y-4"><p>Memuat...</p></div>
+        </main>
+    `,
+    afterRender: async () => {
+        const listEl = document.getElementById('admin-product-list');
+        const form = document.getElementById('product-form');
+        const formTitle = document.getElementById('form-title');
+        const submitBtn = document.getElementById('submit-btn');
+        const cancelBtn = document.getElementById('cancel-edit-btn');
+        const idInput = document.getElementById('product-id');
 
+        const resetForm = () => {
+            form.reset();
+            idInput.value = '';
+            formTitle.innerText = 'Tambah Produk Baru';
+            submitBtn.innerText = 'Simpan';
+            cancelBtn.classList.add('hidden');
+        };
 
-// ============== File: client/assets/js/pages/ProductDetailPage.js ==============
-import state from '../state.js';
-import { fetchProductById } from '../apiService.js';
-import { formatRupiah } from '../utils/formatters.js';
-import { renderProductCard } from '../components/ProductCard.js';
-
-export const renderProductDetailPage = async () => {
-    const product = await fetchProductById(state.currentProductId);
-
-    if (!product) {
-        return `<div class="text-center p-8">Produk tidak ditemukan atau gagal dimuat.</div>`;
-    }
-
-    document.title = `${product.name} - SembakoNOW`;
-    const relatedProducts = state.products
-        .filter(p => p.category === product.category && p.id !== product.id)
-        .slice(0, 5);
-
-    const pageContent = `
-        <div class="container mx-auto p-4">
-            <a href="#products" class="nav-link inline-flex items-center gap-2 text-emerald-600 hover:underline mb-4">
-                <i data-lucide="arrow-left"></i>
-                Kembali ke Produk
-            </a>
-            <div class="bg-white rounded-lg shadow-lg p-4 md:p-8 grid md:grid-cols-2 gap-8">
-                <div>
-                    <img src="${product.image}" alt="[Gambar ${product.name}]" class="w-full rounded-lg" onerror="this.onerror=null;this.src='https://placehold.co/600x600/e2e8f0/334155?text=Error';">
-                </div>
-                <div>
-                    <span class="px-3 py-1 bg-emerald-100 text-emerald-800 text-sm font-medium rounded-full">${product.category}</span>
-                    <h2 class="text-3xl font-bold mt-4 mb-2">${product.name}</h2>
-                    <p class="text-3xl font-bold text-emerald-600 mb-4">${formatRupiah(product.price)}</p>
-                    <p class="text-gray-600 mb-6">${product.description}</p>
-                    <div class="flex items-center gap-4 mb-6">
-                        <label for="quantity" class="font-semibold">Jumlah:</label>
-                        <div class="flex items-center border rounded-md">
-                            <button class="quantity-change-btn p-3" data-action="decrease"><i data-lucide="minus" class="w-4 h-4"></i></button>
-                            <input id="quantity-input" type="number" value="1" min="1" max="${product.stock}" class="w-12 text-center border-l border-r focus:outline-none">
-                            <button class="quantity-change-btn p-3" data-action="increase"><i data-lucide="plus" class="w-4 h-4"></i></button>
+        const loadProducts = async () => {
+            listEl.innerHTML = '<p>Memuat daftar produk...</p>';
+            try {
+                const products = await getProducts();
+                listEl.innerHTML = products.length ? products.map(p => `
+                    <div class="flex items-center justify-between bg-white p-4 rounded-lg shadow">
+                        <span>${p.name}</span>
+                        <div class="space-x-2">
+                            <button data-id="${p.id}" class="edit-btn bg-yellow-500 text-white py-1 px-3 rounded">Edit</button>
+                            <button data-id="${p.id}" class="delete-btn bg-red-500 text-white py-1 px-3 rounded">Hapus</button>
                         </div>
-                        <span class="text-sm text-gray-500">Stok: ${product.stock}</span>
                     </div>
-                    <p class="font-semibold mb-4">Total Harga: <span id="total-price" class="text-emerald-600 text-xl">${formatRupiah(product.price)}</span></p>
-                    <button id="add-to-cart-detail-btn" class="primary-btn w-full" data-id="${product.id}">
-                        <i data-lucide="shopping-cart" class="w-5 h-5 mr-2"></i> Masukkan ke Keranjang
-                    </button>
-                </div>
-            </div>
-            <div class="mt-12">
-                <h3 class="text-2xl font-bold mb-4">Produk Terkait</h3>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                    ${relatedProducts.map(p => renderProductCard(p)).join('')}
-                </div>
-            </div>
-        </div>
-    `;
-    return pageContent;
-};
-
-
-// ============== File: client/assets/js/pages/ProductsPage.js ==============
-import state from '../state.js';
-import { renderProductCard } from '../components/ProductCard.js';
-
-export let handleSearch; // Deklarasikan di luar
-
-export const renderProductsPage = () => {
-    const categories = ['Semua', ...new Set(state.products.map(p => p.category))];
-    const filteredProducts = state.currentCategory === 'Semua' 
-        ? state.products 
-        : state.products.filter(p => p.category === state.currentCategory);
-    
-    document.title = `Produk ${state.currentCategory} - SembakoNOW`;
-
-    let searchTimeout;
-
-    handleSearch = (query) => {
-        const mainProductsView = document.getElementById('main-products-view');
-        const searchResultsContainer = document.getElementById('search-results');
-        
-        if (!mainProductsView || !searchResultsContainer) return;
-
-        clearTimeout(searchTimeout);
-        searchTimeout = setTimeout(() => {
-            query = query.toLowerCase().trim();
-
-            if (!query) {
-                searchResultsContainer.classList.add('hidden');
-                mainProductsView.classList.remove('hidden');
-                return;
+                `).join('') : '<p>Tidak ada produk.</p>';
+            } catch (err) {
+                listEl.innerHTML = '<p class="text-red-500">Gagal memuat produk.</p>';
             }
+        };
 
-            const results = state.products.filter(p => p.name.toLowerCase().includes(query) || p.category.toLowerCase().includes(query));
-            mainProductsView.classList.add('hidden');
-            searchResultsContainer.classList.remove('hidden');
-            searchResultsContainer.innerHTML = `
-                <h3 class="text-2xl font-bold mb-4">Hasil untuk "${query}"</h3>
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-6">
-                    ${results.length > 0 ? results.map(p => renderProductCard(p)).join('') : `<p class="col-span-full text-center py-8 text-gray-500">Oops, produk tidak ditemukan.</p>`}
-                </div>
-            `;
-            lucide.createIcons();
-        }, 300);
-    };
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const productData = {
+                name: form.name.value,
+                price: parseFloat(form.price.value),
+                description: form.description.value,
+                image: form.image.value,
+            };
 
-    const pageContent = `
-        <div class="container mx-auto p-4 min-h-screen">
-            <div class="md:hidden relative mb-4">
-                 <input id="search-input-mobile" type="text" placeholder="Cari produk apa hari ini?" class="w-full pl-10 pr-4 py-3 border rounded-full focus:outline-none focus:ring-2 focus:ring-emerald-400 bg-white shadow-sm">
-                 <i data-lucide="search" class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400 w-5 h-5"></i>
-            </div>
-            <div id="search-results" class="hidden"></div>
-            <div id="main-products-view">
-                <h2 class="text-3xl font-extrabold mb-6 tracking-tight">Kategori <span class="text-emerald-500">${state.currentCategory}</span></h2>
-                <div class="flex space-x-2 overflow-x-auto pb-4 mb-6">
-                    ${categories.map(cat => `
-                        <button class="category-filter-btn px-4 py-2 rounded-full font-semibold text-sm whitespace-nowrap transition-all duration-300
-                            ${state.currentCategory === cat ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg' : 'bg-white text-gray-700 hover:bg-gray-100'}"
-                            data-category="${cat}">
-                            ${cat}
-                        </button>
-                    `).join('')}
-                </div>
-                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-6">
-                    ${filteredProducts.length > 0 ? filteredProducts.map(product => renderProductCard(product)).join('') : `<p class="col-span-full text-center text-gray-500">Produk tidak ditemukan.</p>`}
-                </div>
-            </div>
-        </div>
-    `;
-    return pageContent;
+            if (idInput.value) {
+                await updateProduct(idInput.value, productData);
+                showToast('Produk berhasil diperbarui!', 'success');
+            } else {
+                await addProduct(productData);
+                showToast('Produk berhasil ditambahkan!', 'success');
+            }
+            resetForm();
+            loadProducts();
+        });
+
+        cancelBtn.addEventListener('click', resetForm);
+
+        listEl.addEventListener('click', async (e) => {
+            const id = e.target.dataset.id;
+            if (e.target.classList.contains('delete-btn')) {
+                if (confirm('Yakin hapus produk ini?')) {
+                    await deleteProduct(id);
+                    showToast('Produk berhasil dihapus.', 'info');
+                    loadProducts();
+                }
+            } else if (e.target.classList.contains('edit-btn')) {
+                const p = await getProductById(id);
+                form.name.value = p.name;
+                form.price.value = p.price;
+                form.description.value = p.description;
+                form.image.value = p.image;
+                idInput.value = p.id;
+                formTitle.innerText = 'Edit Produk';
+                submitBtn.innerText = 'Update';
+                cancelBtn.classList.remove('hidden');
+                window.scrollTo(0, 0);
+            }
+        });
+
+        await loadProducts();
+    }
 };

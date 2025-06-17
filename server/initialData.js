@@ -1,24 +1,33 @@
-// File ini digunakan untuk mengisi database saat pertama kali dijalankan.
-// Pastikan tidak ada ringkasan atau pemotongan di sini.
-export const products = [
-    { id: 1, name: 'Beras Rojolele Super 5 Kg', category: 'Sembako', price: 78000, stock: 50, sold: 125, dateAdded: '2023-10-01', image: 'https://placehold.co/600x600/a7f3d0/14532d?text=Beras', description: 'Beras pulen wangi kualitas super, pilihan terbaik untuk keluarga. Dipanen dari padi pilihan.' },
-    { id: 2, name: 'Minyak Goreng SunCo 2L', category: 'Sembako', price: 35000, stock: 80, sold: 250, dateAdded: '2023-10-01', image: 'https://placehold.co/600x600/fef08a/854d0e?text=Minyak', description: 'Minyak goreng bening, tidak cepat menghitam. Membuat gorengan lebih renyah dan sehat.' },
-    { id: 3, name: 'Gula Pasir Gulaku 1 Kg', category: 'Sembako', price: 17500, stock: 150, sold: 180, dateAdded: '2023-10-02', image: 'https://placehold.co/600x600/f3f4f6/4b5563?text=Gula', description: 'Gula tebu asli dengan butiran kristal yang bersih dan manis alami.' },
-    { id: 4, name: 'Tepung Terigu Segitiga Biru 1 Kg', category: 'Sembako', price: 14000, stock: 120, sold: 95, dateAdded: '2023-10-05', image: 'https://placehold.co/600x600/dbeafe/1e3a8a?text=Tepung', description: 'Tepung terigu serbaguna, pilihan tepat untuk aneka kue, roti, dan masakan.' },
-    { id: 5, name: 'Telur Ayam Omega-3 1 Pack (10 butir)', category: 'Makanan Segar', price: 28000, stock: 30, sold: 150, dateAdded: '2023-10-10', image: 'https://placehold.co/600x600/fed7aa/9a3412?text=Telur', description: 'Telur ayam negeri yang diperkaya dengan Omega-3, baik untuk kesehatan otak dan jantung.' },
-    { id: 6, name: 'Indomie Goreng 1 Dus (40 pcs)', category: 'Makanan Instan', price: 115000, stock: 40, sold: 210, dateAdded: '2023-10-03', image: 'https://placehold.co/600x600/fecaca/991b1b?text=Indomie', description: 'Satu dus Indomie Goreng, seleramu. Solusi praktis dan nikmat kapan saja.' },
-    { id: 7, name: 'Kopi Kapal Api Special Mix 10x25g', category: 'Minuman', price: 14500, stock: 70, sold: 80, dateAdded: '2023-10-08', image: 'https://placehold.co/600x600/78716c/1c1917?text=Kopi', description: 'Perpaduan pas antara kopi, gula, dan krimer. Nikmat disajikan panas maupun dingin.' },
-    { id: 8, name: 'Teh Celup Sosro 1 Box (30 pcs)', category: 'Minuman', price: 9500, stock: 120, sold: 110, dateAdded: '2023-10-07', image: 'https://placehold.co/600x600/bbf7d0/166534?text=Teh', description: 'Teh celup asli dari pucuk daun teh pilihan, memberikan aroma dan rasa yang menyegarkan.' },
-    { id: 9, name: 'Sabun Mandi Dettol Cair 410g', category: 'Perawatan Tubuh', price: 25000, stock: 90, sold: 140, dateAdded: '2023-10-01', image: 'https://placehold.co/600x600/bae6fd/0c4a6e?text=Sabun', description: 'Sabun mandi anti-bakteri, memberikan perlindungan terpercaya untuk seluruh keluarga.' },
-    { id: 10, name: 'Deterjen Attack Jaz1 800g', category: 'Kebersihan', price: 19000, stock: 60, sold: 75, dateAdded: '2023-10-06', image: 'https://placehold.co/600x600/c4b5fd/4c1d95?text=Deterjen', description: 'Deterjen dengan wangi semerbak, efektif membersihkan noda membandel pada pakaian.' },
-    { id: 11, name: 'Susu UHT Ultra Milk Coklat 1L', category: 'Minuman', price: 18500, stock: 85, sold: 130, dateAdded: '2023-10-11', image: 'https://placehold.co/600x600/d4d4d8/44403c?text=Susu', description: 'Susu segar UHT rasa coklat yang lezat dan kaya kalsium.' },
-    { id: 12, name: 'Sarden ABC Saus Tomat 425g', category: 'Makanan Kaleng', price: 23000, stock: 55, sold: 65, dateAdded: '2023-10-12', image: 'https://placehold.co/600x600/ef4444/fee2e2?text=Sarden', description: 'Ikan sarden dalam saus tomat kental, siap saji dan praktis.' },
-    { id: 13, name: 'Kecap Manis Bango 550ml', category: 'Sembako', price: 26000, stock: 100, sold: 190, dateAdded: '2023-10-02', image: 'https://placehold.co/600x600/262626/f5f5f5?text=Kecap', description: 'Kecap manis legendaris yang terbuat dari kedelai hitam Malika pilihan.' },
-    { id: 14, name: 'Garam Meja Refina 500g', category: 'Sembako', price: 8000, stock: 200, sold: 155, dateAdded: '2023-10-04', image: 'https://placehold.co/600x600/e0e7ff/3730a3?text=Garam', description: 'Garam beryodium halus dan putih, menyempurnakan setiap masakan.' },
-    { id: 15, name: 'Penyedap Rasa Royco Sapi 100g', category: 'Sembako', price: 5000, stock: 300, sold: 400, dateAdded: '2023-10-01', image: 'https://placehold.co/600x600/fde68a/b45309?text=Royco', description: 'Kaldu sapi bubuk untuk melezatkan aneka sup dan tumisan.' },
-    { id: 16, name: 'Shampo Pantene Anti Lepek 135ml', category: 'Perawatan Tubuh', price: 22000, stock: 70, sold: 90, dateAdded: '2023-10-15', image: 'https://placehold.co/600x600/e9d5ff/581c87?text=Shampo', description: 'Solusi untuk rambut bebas lepek, menjadikannya bervolume dan indah sepanjang hari.' },
-    { id: 17, name: 'Pasta Gigi Pepsodent 190g', category: 'Perawatan Tubuh', price: 12000, stock: 150, sold: 220, dateAdded: '2023-10-03', image: 'https://placehold.co/600x600/a5f3fc/155e75?text=Pepsodent', description: 'Pasta gigi dengan micro-calcium untuk gigi sehat dan kuat.' },
-    { id: 18, name: 'Pembersih Lantai Super Pell 770ml', category: 'Kebersihan', price: 13500, stock: 80, sold: 100, dateAdded: '2023-10-09', image: 'https://placehold.co/600x600/dcfce7/16a34a?text=Super+Pell', description: 'Cairan pembersih lantai dengan wangi segar yang tahan lama dan formula anti-bakteri.' },
-    { id: 19, name: 'Popok Bayi Merries Pants L30', category: 'Ibu & Anak', price: 85000, stock: 25, sold: 45, dateAdded: '2023-10-20', image: 'https://placehold.co/600x600/ffedd5/f97316?text=Popok', description: 'Popok celana dengan daya serap tinggi dan permukaan lembut untuk kenyamanan si kecil.' },
-    { id: 20, name: 'Bawang Merah 250g', category: 'Makanan Segar', price: 9000, stock: 40, sold: 88, dateAdded: '2023-10-25', image: 'https://placehold.co/600x600/fecdd3/be123c?text=Bawang', description: 'Bawang merah segar, bumbu wajib untuk setiap masakan Indonesia.' }
-];
+// Data awal untuk diisi ke database jika file db.json kosong
+export const initialData = {
+  products: [
+    {
+      id: 1,
+      name: 'Sneakers Keren',
+      price: 750000,
+      description: 'Sepatu sneakers yang nyaman dan stylish untuk kegiatan sehari-hari Anda. Dibuat dari bahan berkualitas tinggi.',
+      image: 'https://images.unsplash.com/photo-1542291026-7eec264c27ff?q=80&w=2070&auto=format&fit=crop'
+    },
+    {
+      id: 2,
+      name: 'Jam Tangan Elegan',
+      price: 1200000,
+      description: 'Jam tangan dengan desain klasik yang menambah kesan elegan pada penampilan Anda. Tahan air hingga 50m.',
+      image: 'https://images.unsplash.com/photo-1524805444758-089113d48a6d?q=80&w=1888&auto=format&fit=crop'
+    },
+    {
+      id: 3,
+      name: 'Tas Ransel Modern',
+      price: 450000,
+      description: 'Tas ransel dengan banyak kompartemen untuk membawa laptop dan barang-barang penting lainnya.',
+      image: 'https://images.unsplash.com/photo-1553062407-98eeb68c6a62?q=80&w=1887&auto=format&fit=crop'
+    },
+    {
+      id: 4,
+      name: 'Headphone Wireless',
+      price: 850000,
+      description: 'Nikmati musik tanpa batas dengan headphone wireless berkualitas suara jernih dan bass yang mendalam.',
+      image: 'https://images.unsplash.com/photo-1505740420928-5e560c06d30e?q=80&w=2070&auto=format&fit=crop'
+    }
+  ]
+};

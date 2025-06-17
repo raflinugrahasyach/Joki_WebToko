@@ -1,58 +1,62 @@
-/* Menggunakan font modern dari Google Fonts */
+/* Import Tailwind CSS - INI ADALAH VERSI YANG BENAR */
+@import url('https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css');
+
+/* Custom Base Styles */
 body {
-    font-family: 'Poppins', sans-serif;
+    font-family: 'Inter', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
 }
 
-/* Gaya tombol kustom */
-.primary-btn {
-    @apply inline-flex items-center justify-center px-6 py-3 font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full shadow-lg transition-transform transform hover:scale-105 disabled:opacity-50 disabled:scale-100;
+/* Style untuk Product Card */
+.product-card {
+    transition: transform 0.3s ease-in-out, box-shadow 0.3s ease-in-out;
 }
 
-.secondary-btn {
-    @apply inline-flex items-center justify-center px-5 py-2 font-semibold text-gray-700 bg-white border border-gray-300 rounded-full shadow-sm hover:bg-gray-100 transition-colors;
+.product-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
 }
 
-/* Scrollbar kustom untuk carousel produk */
-.overflow-x-auto::-webkit-scrollbar {
-    height: 8px;
-}
-.overflow-x-auto::-webkit-scrollbar-track {
-    background: #f1f5f9; /* gray-100 */
-    border-radius: 10px;
-}
-.overflow-x-auto::-webkit-scrollbar-thumb {
-    background: #cbd5e1; /* gray-300 */
-    border-radius: 10px;
-}
-.overflow-x-auto::-webkit-scrollbar-thumb:hover {
-    background: #94a3b8; /* gray-400 */
+/* Toast Notification Styles */
+#toast-container {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
 }
 
-/* Animasi Toast Notification */
-@keyframes fade-in-down {
-    from {
-        opacity: 0;
-        transform: translateY(-20px);
-    }
+.toast {
+    display: flex;
+    align-items: center;
+    padding: 1rem 1.5rem;
+    border-radius: 0.5rem;
+    color: white;
+    font-weight: 500;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    opacity: 0;
+    transform: translateX(100%);
+    animation: slideIn 0.5s forwards, fadeOut 0.5s 2.5s forwards;
+}
+
+.toast.success { background-color: #10B981; } /* Green-500 */
+.toast.error { background-color: #EF4444; } /* Red-500 */
+.toast.info { background-color: #3B82F6; } /* Blue-500 */
+
+@keyframes slideIn {
     to {
         opacity: 1;
-        transform: translateY(0);
+        transform: translateX(0);
     }
-}
-.animate-fade-in-down {
-    animation: fade-in-down 0.5s ease-out forwards;
 }
 
-@keyframes fade-out-up {
-    from {
-        opacity: 1;
-        transform: translateY(0);
-    }
+@keyframes fadeOut {
+    from { opacity: 1; }
     to {
         opacity: 0;
-        transform: translateY(-20px);
+        transform: translateY(20px);
     }
-}
-.animate-fade-out-up {
-    animation: fade-out-up 0.5s ease-in forwards;
 }

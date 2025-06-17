@@ -3,39 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SembakoNOW - Belanja Sat-set Sampai Depan Rumah</title>
+    <title>WebToko Modern</title>
     
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Google Fonts: Poppins -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Lucide Icons -->
-    <script src="https://cdn.jsdelivr.net/npm/lucide-static@latest/umd/lucide.js"></script>
+    <link rel="stylesheet" href="./assets/css/style.css">
     
-    <!-- Custom CSS (path relatif dari index.html ini) -->
-    <link rel="stylesheet" href="assets/css/style.css">
-
+    <script type="module" src="./assets/js/app.js" defer></script>
 </head>
-<body class="bg-gray-50 text-gray-800 antialiased">
-
-    <!-- Kontainer untuk komponen yang selalu ada -->
-    <div id="header-container"></div>
+<body class="bg-gray-50 font-sans">
     
-    <!-- Kontainer utama tempat konten halaman dirender -->
-    <main id="app" class="min-h-screen pb-24 md:pb-0">
-        <!-- Konten dinamis akan dirender oleh JavaScript di sini -->
+    <header id="header-container"></header>
+
+    <main id="root">
+        <div class="flex items-center justify-center h-screen">
+            <p class="text-lg text-gray-600">Memuat aplikasi...</p>
+        </div>
     </main>
+    
+    <div id="mobile-nav-container"></div>
+    <div id="toast-container"></div>
 
-    <!-- Navigasi Bawah untuk Mobile -->
-    <nav id="mobile-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t border-gray-200 flex justify-around items-center h-16 z-50">
-        <!-- Link navigasi mobile akan disuntikkan oleh JavaScript -->
-    </nav>
-
-    <!-- PENTING: Memuat app.js sebagai module. Path ini benar jika index.html ada di dalam /client -->
-    <script type="module" src="assets/js/app.js"></script>
 </body>
 </html>

@@ -1,37 +1,32 @@
-// ============== File: client/assets/js/utils/formatters.js ==============
-export const formatRupiah = (number) => new Intl.NumberFormat('id-ID', {
-    style: 'currency',
-    currency: 'IDR',
-    minimumFractionDigits: 0
-}).format(number);
-
-
-// ============== File: client/assets/js/utils/icons.js ==============
-export const ICONS = {
-    logo: `<svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M7.5 7.5C7.5 5.84315 8.84315 4.5 10.5 4.5H13.5C15.1569 4.5 16.5 5.84315 16.5 7.5V11.25H7.5V7.5Z" class="fill-emerald-500"/><path d="M5.25 11.25H18.75L19.5 17.25C19.5 18.4926 18.4926 19.5 17.25 19.5H6.75C5.50736 19.5 4.5 18.4926 4.5 17.25L5.25 11.25Z" class="fill-emerald-600"/><path d="M10.5 9.75H13.5" stroke="white" stroke-width="1.5" stroke-linecap="round"/></svg>`,
+// ISI DARI: client/assets/js/utils/formatters.js
+export const formatCurrency = (number) => {
+    return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+        minimumFractionDigits: 0,
+    }).format(number);
 };
 
+// =======================================================
 
-// ============== File: client/assets/js/utils/toast.js ==============
-export function showToast(message, isError = false) {
-    const toastId = 'toast-notification';
-    const existingToast = document.getElementById(toastId);
-    if (existingToast) existingToast.remove();
+// ISI DARI: client/assets/js/utils/icons.js
+export const cartIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>`;
+export const menuIcon = `<svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>`;
+
+// =======================================================
+
+// ISI DARI: client/assets/js/utils/toast.js
+export const showToast = (message, type = 'success') => {
+    const container = document.getElementById('toast-container');
+    if (!container) return;
 
     const toast = document.createElement('div');
-    toast.id = toastId;
-    const bgColor = isError ? 'bg-red-600' : 'bg-gray-900';
-    const icon = isError ? `<i data-lucide="alert-circle" class="inline-block mr-2 w-5 h-5 text-white"></i>` : `<i data-lucide="check-circle" class="inline-block mr-2 w-5 h-5 text-emerald-400"></i>`;
-    
-    toast.className = `fixed top-5 right-5 ${bgColor} text-white py-3 px-6 rounded-lg shadow-xl text-sm z-50 animate-fade-in-down`;
-    toast.innerHTML = `${icon} ${message}`;
-    
-    document.body.appendChild(toast);
-    lucide.createIcons({ attrs: { 'stroke-width': 2 } });
+    toast.className = `toast ${type}`;
+    toast.innerText = message;
+
+    container.appendChild(toast);
 
     setTimeout(() => {
-        toast.classList.remove('animate-fade-in-down');
-        toast.classList.add('animate-fade-out-up');
-        setTimeout(() => toast.remove(), 500);
-    }, 4000);
-}
+        toast.remove();
+    }, 3000);
+};

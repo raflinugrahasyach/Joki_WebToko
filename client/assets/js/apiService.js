@@ -1,79 +1,31 @@
-// =========================================================================
-// Berkas: client/assets/js/apiService.js
-// =========================================================================
 const API_BASE_URL = 'http://localhost:3000/api';
 
-export async function fetchProducts() {
+const fetchAPI = async (url, options = {}) => {
     try {
-        const response = await fetch(`${API_BASE_URL}/products`);
+        const response = await fetch(url, options);
         if (!response.ok) {
-            throw new Error('Gagal mengambil data produk dari server.');
+            const errorData = await response.json().catch(() => ({ message: `HTTP error! Status: ${response.status}` }));
+            throw new Error(errorData.message);
         }
+        if (response.status === 204) return null;
         return await response.json();
     } catch (error) {
-        console.error("Error di fetchProducts:", error);
-        return null;
+        console.error('API Fetch Error:', error.message);
+        // Melempar kembali error agar bisa ditangkap oleh pemanggil
+        throw error;
     }
-}
+};
 
-export async function fetchProductById(id) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/products/${id}`);
-        if (!response.ok) {
-            throw new Error(`Gagal mengambil data produk dengan ID: ${id}`);
-        }
-        return await response.json();
-    } catch (error) {
-        console.error("Error di fetchProductById:", error);
-        return null;
-    }
-}
-
-export async function submitOrder(orderData) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/orders`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(orderData),
-        });
-        const result = await response.json();
-        if (!response.ok) {
-            throw new Error(result.message || 'Gagal membuat pesanan');
-        }
-        return { success: true, data: result };
-    } catch (error) {
-        console.error("Error di submitOrder:", error);
-        return { success: false, message: error.message };
-    }
-}
-
-export async function addProduct(productData) {
-    try {
-        const response = await fetch(`${API_BASE_URL}/products`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(productData)
-        });
-        const result = await response.json();
-        if (!response.ok) {
-            throw new Error(result.message || 'Gagal menambah produk');
-        }
-        return { success: true, data: result };
-    } catch(error) {
-        console.error("Error di addProduct:", error);
-        return { success: false, message: error.message };
-    }
-}
-
-export async function fetchHistory() {
-     try {
-        const response = await fetch(`${API_BASE_URL}/history`);
-        if (!response.ok) {
-            throw new Error('Gagal mengambil data riwayat');
-        }
-        return await response.json();
-    } catch (error) {
-        console.error("Error di fetchHistory:", error);
-        return { soldProducts: [], newProducts: [] };
-    }
-}
+export const getProducts = () => fetchAPI(`${API_BASE_URL}/products`);
+export const getProductById = (id) => fetchAPI(`${API_BASE_URL}/products/${id}`);
+export const addProduct = (productData) => fetchAPI(`${API_BASE_URL}/products`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(productData),
+});
+export const updateProduct = (id, productData) => fetchAPI(`${API_BASE_URL}/products/${id}`, {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(productData),
+});
+export const deleteProduct = (id) => fetchAPI(`${API_BASE_URL}/products/${id}`, { method: 'DELETE' });
