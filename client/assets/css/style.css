@@ -1,0 +1,58 @@
+/* Menggunakan font modern dari Google Fonts */
+body {
+    font-family: 'Poppins', sans-serif;
+}
+
+/* Gaya tombol kustom */
+.primary-btn {
+    @apply inline-flex items-center justify-center px-6 py-3 font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-500 rounded-full shadow-lg transition-transform transform hover:scale-105 disabled:opacity-50 disabled:scale-100;
+}
+
+.secondary-btn {
+    @apply inline-flex items-center justify-center px-5 py-2 font-semibold text-gray-700 bg-white border border-gray-300 rounded-full shadow-sm hover:bg-gray-100 transition-colors;
+}
+
+/* Scrollbar kustom untuk carousel produk */
+.overflow-x-auto::-webkit-scrollbar {
+    height: 8px;
+}
+.overflow-x-auto::-webkit-scrollbar-track {
+    background: #f1f5f9; /* gray-100 */
+    border-radius: 10px;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb {
+    background: #cbd5e1; /* gray-300 */
+    border-radius: 10px;
+}
+.overflow-x-auto::-webkit-scrollbar-thumb:hover {
+    background: #94a3b8; /* gray-400 */
+}
+
+/* Animasi Toast Notification */
+@keyframes fade-in-down {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+.animate-fade-in-down {
+    animation: fade-in-down 0.5s ease-out forwards;
+}
+
+@keyframes fade-out-up {
+    from {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    to {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+}
+.animate-fade-out-up {
+    animation: fade-out-up 0.5s ease-in forwards;
+}
