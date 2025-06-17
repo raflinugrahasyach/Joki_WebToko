@@ -16,24 +16,26 @@
     <!-- Lucide Icons -->
     <script src="https://cdn.jsdelivr.net/npm/lucide-static@latest/umd/lucide.js"></script>
     
-    <!-- Custom CSS -->
+    <!-- Custom CSS (path relatif dari index.html ini) -->
     <link rel="stylesheet" href="assets/css/style.css">
 
 </head>
 <body class="bg-gray-50 text-gray-800 antialiased">
 
-    <!-- Header and Main Content Container -->
+    <!-- Kontainer untuk komponen yang selalu ada -->
     <div id="header-container"></div>
+    
+    <!-- Kontainer utama tempat konten halaman dirender -->
     <main id="app" class="min-h-screen pb-24 md:pb-0">
-        <!-- Content is dynamically rendered here -->
+        <!-- Konten dinamis akan dirender oleh JavaScript di sini -->
     </main>
 
-    <!-- Mobile Bottom Navigation -->
+    <!-- Navigasi Bawah untuk Mobile -->
     <nav id="mobile-nav" class="md:hidden fixed bottom-0 left-0 right-0 bg-white/80 backdrop-blur-sm border-t border-gray-200 flex justify-around items-center h-16 z-50">
-        <!-- Mobile nav links are injected here -->
+        <!-- Link navigasi mobile akan disuntikkan oleh JavaScript -->
     </nav>
 
-    <!-- Menggunakan type="module" untuk arsitektur JavaScript modern -->
+    <!-- PENTING: Memuat app.js sebagai module. Path ini benar jika index.html ada di dalam /client -->
     <script type="module" src="assets/js/app.js"></script>
 </body>
 </html>
