@@ -4,36 +4,50 @@ import { JSONFilePreset } from 'lowdb/node';
 import { products as initialProducts } from './initialData.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import os from 'os'; // <-- BARU: Impor modul 'os'
+import os from 'os';
+import fs from 'fs'; // <-- Impor modul 'fs' untuk mengecek file
+
+console.log("Server script starting...");
 
 // Konfigurasi Server
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// Setup __dirname untuk ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Middleware
 app.use(cors());
 app.use(express.json());
 
 // --- PERBAIKAN PENTING UNTUK VERCEL ---
-// Tentukan path database: gunakan folder /tmp di Vercel, atau folder lokal saat development
+console.log("Initializing database path...");
 const dbPath = process.env.VERCEL ? path.join(os.tmpdir(), 'db.json') : path.join(__dirname, 'db.json');
+console.log(`Database path set to: ${dbPath}`);
+
+// Jika file db.json belum ada di /tmp, buat dengan data awal
+if (process.env.VERCEL && !fs.existsSync(dbPath)) {
+    console.log("db.json not found in /tmp, creating a new one...");
+    fs.writeFileSync(dbPath, JSON.stringify({ products: initialProducts, orders: [] }));
+    console.log("db.json created successfully in /tmp.");
+}
+
 const defaultData = { products: initialProducts, orders: [] };
 const db = await JSONFilePreset(dbPath, defaultData);
+console.log("Database initialized successfully.");
 
 
-// --- Sajikan file statis dari folder client ---
+// Sajikan file statis dari folder client
 app.use(express.static(path.join(__dirname, '../client')));
 
 
-// === DEFINISI API ENDPOINTS (Tidak ada perubahan di sini) ===
-app.get('/api/products', (req, res) => {
-  res.json(db.data.products);
+// === DEFINISI API ENDPOINTS ===
+app.get('/api/products', async (req, res) => {
+    console.log("GET /api/products hit");
+    await db.read(); // Selalu baca data terbaru
+    res.json(db.data.products);
 });
 
+// ... (semua endpoint API lainnya tetap sama)
 app.get('/api/products/:id', (req, res) => {
     const productId = parseInt(req.params.id);
     const product = db.data.products.find(p => p.id === productId);
@@ -43,21 +57,16 @@ app.get('/api/products/:id', (req, res) => {
 
 app.post('/api/orders', async (req, res) => {
     const { customerData, cartItems } = req.body;
-    if (!customerData || !cartItems || !cartItems.length) {
-        return res.status(400).json({ message: 'Data pesanan tidak lengkap' });
-    }
+    if (!customerData || !cartItems || !cartItems.length) return res.status(400).json({ message: 'Data pesanan tidak lengkap' });
     try {
-        // Operasi database...
-        await db.read(); // Baca data terbaru sebelum memodifikasi
+        await db.read();
         cartItems.forEach(item => {
             const productInDb = db.data.products.find(p => p.id === item.productId);
             if (productInDb) {
                 if (productInDb.stock >= item.quantity) {
                     productInDb.stock -= item.quantity;
                     productInDb.sold += item.quantity;
-                } else {
-                    throw new Error(`Stok untuk ${productInDb.name} tidak mencukupi.`);
-                }
+                } else { throw new Error(`Stok untuk ${productInDb.name} tidak mencukupi.`); }
             }
         });
         const newOrder = { id: Date.now(), ...customerData, items: cartItems, orderDate: new Date().toISOString() };
@@ -69,7 +78,6 @@ app.post('/api/orders', async (req, res) => {
     }
 });
 
-// ... (Endpoint lainnya tetap sama) ...
 app.post('/api/products', async (req, res) => {
     const { name, category, price, stock } = req.body;
     if (!name || !category || !price || !stock) return res.status(400).json({ message: 'Data produk tidak lengkap' });
@@ -80,19 +88,20 @@ app.post('/api/products', async (req, res) => {
     res.status(201).json(newProduct);
 });
 
-app.get('/api/history', (req, res) => {
+app.get('/api/history', async (req, res) => {
+    await db.read();
     const soldProducts = [...db.data.products].filter(p => p.sold > 0).sort((a, b) => b.sold - a.sold);
     const newProducts = [...db.data.products].sort((a,b) => new Date(b.dateAdded) - new Date(a.dateAdded));
     res.json({ soldProducts, newProducts });
 });
 
 
-// --- Catch-all route untuk menyajikan index.html dari frontend ---
+// Catch-all route untuk frontend
 app.get('*', (req, res) => {
   res.sendFile(path.join(__dirname, '../client', 'index.html'));
 });
 
 // Menjalankan Server
 app.listen(PORT, () => {
-  console.log(`🚀 Server SembakoNOW berjalan di http://localhost:${PORT}`);
+  console.log(`🚀 Server SembakoNOW berjalan di port ${PORT}`);
 });
