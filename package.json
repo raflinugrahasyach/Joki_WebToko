@@ -1,19 +1,20 @@
 {
-  "name": "webtoko-server",
+  "name": "sembakonow-fullstack-monorepo",
   "version": "1.0.0",
-  "description": "Server untuk WebToko",
-  "main": "server.js",
+  "description": "Fullstack SembakoNOW application for Vercel",
+  "private": true,
+  "main": "server/server.js",
   "type": "module",
   "scripts": {
-    "start": "nodemon server.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server/server.js",
+    "dev": "node --watch server/server.js"
   },
-  "author": "Rafli",
+  "keywords": [],
+  "author": "",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
     "express": "^4.19.2",
-    "lowdb": "^7.0.1",
-    "nodemon": "^3.1.4"
+    "lowdb": "^7.0.1"
   }
 }
