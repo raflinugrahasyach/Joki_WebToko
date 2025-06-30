@@ -13,12 +13,11 @@
         },
         {
             "src": "/assets/(.*)",
-            "dest": "client/assets/$1"
+            "dest": "/client/assets/$1"
         },
         {
             "src": "/(.*)",
-            "dest": "client/index.html"
+            "dest": "/client/index.html"
         }
-    ],
-    "installCommand": "npm install"
+    ]
 }
