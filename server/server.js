@@ -5,11 +5,10 @@ import { products as initialProducts } from './initialData.js';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import os from 'os';
-import fs from 'fs'; // <-- Impor modul 'fs' untuk mengecek file
+import fs from 'fs';
 
 console.log("Server script starting...");
 
-// Konfigurasi Server
 const app = express();
 const PORT = process.env.PORT || 3000;
 
@@ -19,12 +18,11 @@ const __dirname = path.dirname(__filename);
 app.use(cors());
 app.use(express.json());
 
-// --- PERBAIKAN PENTING UNTUK VERCEL ---
+// --- PERBAIKAN DATABASE UNTUK VERCEL (Sudah Benar) ---
 console.log("Initializing database path...");
 const dbPath = process.env.VERCEL ? path.join(os.tmpdir(), 'db.json') : path.join(__dirname, 'db.json');
 console.log(`Database path set to: ${dbPath}`);
 
-// Jika file db.json belum ada di /tmp, buat dengan data awal
 if (process.env.VERCEL && !fs.existsSync(dbPath)) {
     console.log("db.json not found in /tmp, creating a new one...");
     fs.writeFileSync(dbPath, JSON.stringify({ products: initialProducts, orders: [] }));
@@ -35,19 +33,22 @@ const defaultData = { products: initialProducts, orders: [] };
 const db = await JSONFilePreset(dbPath, defaultData);
 console.log("Database initialized successfully.");
 
+// =================================================================
+// ===== PERBAIKAN KUNCI: PATH UNTUK FILE STATIS & FRONTEND =====
+// =================================================================
+// Daripada '../client', kita gunakan path absolut dari root proyek di Vercel.
+const clientPath = path.resolve(process.cwd(), 'client');
+console.log(`Path to client folder resolved to: ${clientPath}`);
+app.use(express.static(clientPath));
 
-// Sajikan file statis dari folder client
-app.use(express.static(path.join(__dirname, '../client')));
 
-
-// === DEFINISI API ENDPOINTS ===
+// === DEFINISI API ENDPOINTS (Tidak ada perubahan) ===
 app.get('/api/products', async (req, res) => {
     console.log("GET /api/products hit");
-    await db.read(); // Selalu baca data terbaru
+    await db.read();
     res.json(db.data.products);
 });
 
-// ... (semua endpoint API lainnya tetap sama)
 app.get('/api/products/:id', (req, res) => {
     const productId = parseInt(req.params.id);
     const product = db.data.products.find(p => p.id === productId);
@@ -96,12 +97,20 @@ app.get('/api/history', async (req, res) => {
 });
 
 
-// Catch-all route untuk frontend
+// =================================================================
+// ===== PERBAIKAN KUNCI: CATCH-ALL ROUTE UNTUK FRONTEND =====
+// =================================================================
 app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client', 'index.html'));
+    // Kita pastikan untuk menyajikan index.html dari path yang sudah kita perbaiki.
+    const indexPath = path.join(clientPath, 'index.html');
+    if (fs.existsSync(indexPath)) {
+        res.sendFile(indexPath);
+    } else {
+        res.status(404).send('Client entry point (index.html) not found at path: ' + indexPath);
+    }
 });
 
 // Menjalankan Server
 app.listen(PORT, () => {
-  console.log(`🚀 Server SembakoNOW berjalan di port ${PORT}`);
+    console.log(`🚀 Server SembakoNOW berjalan di port ${PORT}`);
 });
