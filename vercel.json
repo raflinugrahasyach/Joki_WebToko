@@ -3,7 +3,13 @@
   "builds": [
     {
       "src": "package.json",
-      "use": "@vercel/node"
+      "use": "@vercel/node",
+      "config": {
+        "includeFiles": [
+          "server/**",
+          "client/**"
+        ]
+      }
     }
   ],
   "routes": [
@@ -13,11 +19,11 @@
     },
     {
       "src": "/assets/(.*)",
-      "dest": "/client/assets/$1"
+      "dest": "client/assets/$1"
     },
     {
       "src": "/(.*)",
-      "dest": "/client/index.html"
+      "dest": "client/index.html"
     }
   ]
 }
